@@ -24,6 +24,7 @@ pat_ns_help = re.compile(r"nosetting help", re.IGNORECASE)
 pat_space = re.compile(r"^\s+")
 pat_space2 = re.compile(r"\s+$")
 
+
 def post_msg(msg, channel, unfurl=True):
     sc.api_call(
         "chat.postMessage",
@@ -33,11 +34,15 @@ def post_msg(msg, channel, unfurl=True):
         unfurl_links=unfurl,
         username="nosponse"
     )
+
+
 def response_msg(rtm, msg):
     post_msg(msg, channel=rtm["channel"])
 
+
 def post_rand_msg(rtm, lis):
     post_msg(random.choice(lis), channel=rtm["channel"])
+
 
 def response(rtm):
     if rtm["text"] in enable_responses:
@@ -46,10 +51,11 @@ def response(rtm):
         else:
             post_rand_msg(rtm, enable_responses[rtm["text"]])
 
+
 def add_respond(rtm):
     if pat_ns_res.match(rtm["text"]):
         string = pat_ns_res.sub("", rtm["text"], count=1)
-        list = re.split(r" to ", string , maxsplit=1, flags=re.IGNORECASE)
+        list = re.split(r" to ", string, maxsplit=1, flags=re.IGNORECASE)
         if len(list) != 2:
             response_msg(rtm, "Error!")
             return
@@ -74,11 +80,12 @@ def add_respond(rtm):
         dicjdump(enable_responses, "responses.json")
         response_msg(rtm, "Success!")
 
+
 def add_rand_respond(rtm):
     if pat_ns_rnd.match(rtm["text"]):
         string = pat_ns_rnd.sub("", rtm["text"], count=1)
         list = re.split(r"\n", string)
-        if len(list) <=2:
+        if len(list) <= 2:
             response_msg(rtm, "Error!")
             return
         for li in range(len(list)):
@@ -92,16 +99,18 @@ def add_rand_respond(rtm):
         enable_responses[mes] = res
         dicjdump(enable_responses, "responses.json")
         response_msg(rtm, "Success!")
-        
+
+
 def show_details(rtm):
     if pat_ns_SC.match(rtm["text"]):
         ch_link = []
         for chs in enable_channels.keys():
-            ch_link.append("<#" + chs +"|"+ enable_channels[chs]+">")
+            ch_link.append("<#" + chs + "|" + enable_channels[chs]+">")
         response_msg(rtm, pprint.pformat(ch_link, indent=4))
     if pat_ns_SR.match(rtm["text"]):
         res = pprint.pformat(enable_responses, indent=4)
         post_msg(escape_uid(res), rtm["channel"], unfurl=False)
+
 
 def add_channel(rtm, inCh):
     if pat_ns_AC.match(rtm["text"]):
@@ -112,15 +121,18 @@ def add_channel(rtm, inCh):
         else:
             response_msg(rtm, "Success!")
 
+
 def dis_channel(rtm):
     if pat_ns_DC.match(rtm["text"]):
         del enable_channels[rtm["channel"]]
         dicjdump(enable_channels, "enable_channels.json")
         response_msg(rtm, "Success!")
 
+
 def show_help(rtm):
     if pat_ns_help.match(rtm["text"]):
-        response_msg(rtm, "`nosetting respond A to B` : BにAと返す反応を追加します。\n"+"`nosetting randomres A \\n B\\n C\\n ...` : Aに対してB,C...をランダムに返す反応を追加します。\n"+"`nosetting addThisChannel` : そのチャンネルでこのbotを有効化します。\n"+"`nosetting disableThisChannel` : そのチャンネルでこのbotを無効化します。\n"+"`nosetting show Channels` : このbotが有効なチャンネルを表示します。\n"+"`nosetting show responses` : 設定されている反応を表示します。")
+        response_msg(rtm, "`nosetting respond A to B` : BにAと返す反応を追加します。\n" + "`nosetting randomres A \\n B\\n C\\n ...` : Aに対してB,C...をランダムに返す反応を追加します。\n"+"`nosetting addThisChannel` : そのチャンネルでこのbotを有効化します。\n"+"`nosetting disableThisChannel` : そのチャンネルでこのbotを無効化します。\n"+"`nosetting show Channels` : このbotが有効なチャンネルを表示します。\n"+"`nosetting show responses` : 設定されている反応を表示します。")
+
 
 def get_channel_name(channelid):
     channelname = ""
@@ -132,6 +144,7 @@ def get_channel_name(channelid):
                 return channelname
         return "not found"
 
+
 def get_channel_id(channelname):
     channelid = ""
     ch_list = sc.api_call("channels.list", exclude_archived=True, exclude_members=True)
@@ -141,6 +154,7 @@ def get_channel_id(channelname):
                 channelid = channel["id"]
                 return channelid
         return "not found"
+
 
 def get_user_name(userid):
     username = ""
@@ -152,6 +166,7 @@ def get_user_name(userid):
                 return username
         return "not found"
 
+
 def escape_uid(text):
     res = text.replace("!", "！")
     for found in re.findall(r"<@(.*?)>", text):
@@ -159,8 +174,10 @@ def escape_uid(text):
     res = res.replace("@", "＠")
     return res
 
+
 def post_Karen(Karen_lines):
     post_msg(random.choice(Karen_lines), "C61K9HKDM")
+
 
 def set_interval(func, delay, sleep_time, *param):
     def body():
@@ -171,20 +188,26 @@ def set_interval(func, delay, sleep_time, *param):
     t = threading.Thread(target=body, daemon=True)
     t.start()
 
-def set_interv_athour(func, delay, at_hour, _param): # 諸事情によりパラメータ一つしか指定できず
+
+def set_interv_athour(func, delay, at_hour, _param):  # 諸事情によりパラメータ一つしか指定できず
     atdt = datetime.datetime.now().replace(hour=at_hour, minute=0, second=0)
     if atdt < datetime.datetime.now():
         atdt = atdt + datetime.timedelta(days=1)
     sleeptime = (atdt - datetime.datetime.now()).seconds
     set_interval(func, delay, sleeptime, _param)
 
+
 def j_file2dic(_file):
     with open(_file, "r", encoding="utf-8") as filed:
         dic = json.load(filed)
     return dic
+
+
 def dicjdump(dic, _file):
     with open(_file, "w", encoding="utf-8") as filed:
         json.dump(dic, filed, indent=4)
+
+
 def file2list(_file):
     with open(_file, "r", encoding="utf-8") as filed:
         _list = list(filed)
