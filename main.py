@@ -24,7 +24,7 @@ pat_ns_help = re.compile(r"nosetting help", re.IGNORECASE)
 pat_space = re.compile(r"^\s+")
 pat_space2 = re.compile(r"\s+$")
 
-def postMsg(msg, channel, unfurl=True):
+def post_msg(msg, channel, unfurl=True):
     sc.api_call(
         "chat.postMessage",
         channel=channel,
@@ -33,25 +33,25 @@ def postMsg(msg, channel, unfurl=True):
         unfurl_links=unfurl,
         username="nosponse"
     )
-def responseMsg(rtm, msg):
-    postMsg(msg, channel=rtm["channel"])
+def response_msg(rtm, msg):
+    post_msg(msg, channel=rtm["channel"])
 
-def postRandMsg(rtm, lis):
-    postMsg(random.choice(lis), channel=rtm["channel"])
+def post_rand_msg(rtm, lis):
+    post_msg(random.choice(lis), channel=rtm["channel"])
 
 def response(rtm):
-    if rtm["text"] in enableResponses:
-        if isinstance(enableResponses[rtm["text"]], str):
-            responseMsg(rtm, enableResponses[rtm["text"]])
+    if rtm["text"] in enable_responses:
+        if isinstance(enable_responses[rtm["text"]], str):
+            response_msg(rtm, enable_responses[rtm["text"]])
         else:
-            postRandMsg(rtm, enableResponses[rtm["text"]])
+            post_rand_msg(rtm, enable_responses[rtm["text"]])
 
-def addRespond(rtm):
+def add_respond(rtm):
     if pat_ns_res.match(rtm["text"]):
         string = pat_ns_res.sub("", rtm["text"], count=1)
         list = re.split(r" to ", string , maxsplit=1, flags=re.IGNORECASE)
         if len(list) != 2:
-            responseMsg(rtm, "Error!")
+            response_msg(rtm, "Error!")
             return
         res = list[0]
         mes = list[1]
@@ -60,67 +60,67 @@ def addRespond(rtm):
         res = pat_space2.sub("", res)
         mes = pat_space2.sub("", mes)
         if mes == "":
-            responseMsg(rtm, "Error!")
+            response_msg(rtm, "Error!")
             return
         if res == "":
-            if mes in enableResponses:
-                del enableResponses[mes]
-                responseMsg(rtm, "Deleted the response!")
-                dicjdump(enableResponses, "responses.json")
+            if mes in enable_responses:
+                del enable_responses[mes]
+                response_msg(rtm, "Deleted the response!")
+                dicjdump(enable_responses, "responses.json")
                 return
-            responseMsg(rtm, "Error!")
+            response_msg(rtm, "Error!")
             return
-        enableResponses[mes] = res
-        dicjdump(enableResponses, "responses.json")
-        responseMsg(rtm, "Success!")
+        enable_responses[mes] = res
+        dicjdump(enable_responses, "responses.json")
+        response_msg(rtm, "Success!")
 
-def addRandrespond(rtm):
+def add_rand_respond(rtm):
     if pat_ns_rnd.match(rtm["text"]):
         string = pat_ns_rnd.sub("", rtm["text"], count=1)
         list = re.split(r"\n", string)
         if len(list) <=2:
-            responseMsg(rtm, "Error!")
+            response_msg(rtm, "Error!")
             return
         for li in range(len(list)):
             list[li] = pat_space.sub("", list[li])
             list[li] = pat_space2.sub("", list[li])
             if list[li] == "":
-                responseMsg(rtm, "Error!")
+                response_msg(rtm, "Error!")
                 return
         mes = list.pop(0)
         res = list
-        enableResponses[mes] = res
-        dicjdump(enableResponses, "responses.json")
-        responseMsg(rtm, "Success!")
+        enable_responses[mes] = res
+        dicjdump(enable_responses, "responses.json")
+        response_msg(rtm, "Success!")
         
-def showDetails(rtm):
+def show_details(rtm):
     if pat_ns_SC.match(rtm["text"]):
         ch_link = []
-        for chs in enableChannels.keys():
-            ch_link.append("<#" + chs +"|"+ enableChannels[chs]+">")
-        responseMsg(rtm, pprint.pformat(ch_link, indent=4))
+        for chs in enable_channels.keys():
+            ch_link.append("<#" + chs +"|"+ enable_channels[chs]+">")
+        response_msg(rtm, pprint.pformat(ch_link, indent=4))
     if pat_ns_SR.match(rtm["text"]):
-        res = pprint.pformat(enableResponses, indent=4)
-        postMsg(escape_uid(res), rtm["channel"], unfurl=False)
+        res = pprint.pformat(enable_responses, indent=4)
+        post_msg(escape_uid(res), rtm["channel"], unfurl=False)
 
-def addChannel(rtm, inCh):
+def add_channel(rtm, inCh):
     if pat_ns_AC.match(rtm["text"]):
-        enableChannels[rtm["channel"]] = get_channel_name(rtm["channel"])
-        dicjdump(enableChannels, "enable_channels.json")
+        enable_channels[rtm["channel"]] = get_channel_name(rtm["channel"])
+        dicjdump(enable_channels, "enable_channels.json")
         if inCh:
-            responseMsg(rtm, "Updated!")
+            response_msg(rtm, "Updated!")
         else:
-            responseMsg(rtm, "Success!")
+            response_msg(rtm, "Success!")
 
-def disChannel(rtm):
+def dis_channel(rtm):
     if pat_ns_DC.match(rtm["text"]):
-        del enableChannels[rtm["channel"]]
-        dicjdump(enableChannels, "enable_channels.json")
-        responseMsg(rtm, "Success!")
+        del enable_channels[rtm["channel"]]
+        dicjdump(enable_channels, "enable_channels.json")
+        response_msg(rtm, "Success!")
 
-def showhelp(rtm):
+def show_help(rtm):
     if pat_ns_help.match(rtm["text"]):
-        responseMsg(rtm, "`nosetting respond A to B` : BにAと返す反応を追加します。\n"+"`nosetting randomres A \\n B\\n C\\n ...` : Aに対してB,C...をランダムに返す反応を追加します。\n"+"`nosetting addThisChannel` : そのチャンネルでこのbotを有効化します。\n"+"`nosetting disableThisChannel` : そのチャンネルでこのbotを無効化します。\n"+"`nosetting show Channels` : このbotが有効なチャンネルを表示します。\n"+"`nosetting show responses` : 設定されている反応を表示します。")
+        response_msg(rtm, "`nosetting respond A to B` : BにAと返す反応を追加します。\n"+"`nosetting randomres A \\n B\\n C\\n ...` : Aに対してB,C...をランダムに返す反応を追加します。\n"+"`nosetting addThisChannel` : そのチャンネルでこのbotを有効化します。\n"+"`nosetting disableThisChannel` : そのチャンネルでこのbotを無効化します。\n"+"`nosetting show Channels` : このbotが有効なチャンネルを表示します。\n"+"`nosetting show responses` : 設定されている反応を表示します。")
 
 def get_channel_name(channelid):
     channelname = ""
@@ -159,8 +159,8 @@ def escape_uid(text):
     res = res.replace("@", "＠")
     return res
 
-def postKaren(Karen_lines):
-    postMsg(random.choice(Karen_lines), "C61K9HKDM")
+def post_Karen(Karen_lines):
+    post_msg(random.choice(Karen_lines), "C61K9HKDM")
 
 def set_interval(func, delay, sleep_time, *param):
     def body():
@@ -178,7 +178,7 @@ def set_interv_athour(func, delay, at_hour, _param): # 諸事情によりパラ�
     sleeptime = (atdt - datetime.datetime.now()).seconds
     set_interval(func, delay, sleeptime, _param)
 
-def jfile2dic(_file):
+def j_file2dic(_file):
     with open(_file, "r", encoding="utf-8") as filed:
         dic = json.load(filed)
     return dic
@@ -191,33 +191,33 @@ def file2list(_file):
     return _list
 
 
-enableChannels = jfile2dic("enable_channels.json")
-enableResponses = jfile2dic("responses.json")
+enable_channels = j_file2dic("enable_channels.json")
+enable_responses = j_file2dic("responses.json")
 Karen_lines = file2list("Karen_morning.txt")
 
 if sc.rtm_connect():
-    for ch in enableChannels.keys():
-        enableChannels[ch] = get_channel_name(ch)
-    set_interv_athour(postKaren, 86400, 8, Karen_lines)
+    for ch in enable_channels.keys():
+        enable_channels[ch] = get_channel_name(ch)
+    set_interv_athour(post_Karen, 86400, 8, Karen_lines)
     while True:
         try:
             for rtm in sc.rtm_read():
                 if rtm["type"] == "message":
                     if "subtype" not in rtm and "text" in rtm:
-                        inCh = rtm["channel"] in enableChannels
+                        inCh = rtm["channel"] in enable_channels
                         if inCh:
                             response(rtm)
-                            addRespond(rtm)
-                            disChannel(rtm)
-                            showDetails(rtm)
-                            showhelp(rtm)
-                            addChannel(rtm, inCh)
-                            addRandrespond(rtm)
+                            add_respond(rtm)
+                            dis_channel(rtm)
+                            show_details(rtm)
+                            show_help(rtm)
+                            add_channel(rtm, inCh)
+                            add_rand_respond(rtm)
                         else:
-                            addChannel(rtm, inCh)
+                            add_channel(rtm, inCh)
         except websocket._exceptions.WebSocketConnectionClosedException:
             if sc.rtm_connect():
-                postMsg(random.choice([":nos: 再接続完了デース！", ":nos: 接続しなおしておきマシタ！"]), "C61K9HKDM")
+                post_msg(random.choice([":nos: 再接続完了デース！", ":nos: 接続しなおしておきマシタ！"]), "C61K9HKDM")
             else:
                 print("Connection Failed!")
                 break
