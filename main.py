@@ -210,40 +210,40 @@ def dicjdump(dic, _file):
 
 def file2list(_file):
     with open(_file, "r", encoding="utf-8") as filed:
-        _list = list(filed)
-    return _list
+        ret = list(filed)
+    return ret
 
+if __name__ == "__main__":
+    enable_channels = j_file2dic("enable_channels.json")
+    enable_responses = j_file2dic("responses.json")
+    Karen_lines = file2list("Karen_morning.txt")
 
-enable_channels = j_file2dic("enable_channels.json")
-enable_responses = j_file2dic("responses.json")
-Karen_lines = file2list("Karen_morning.txt")
-
-if sc.rtm_connect():
-    for ch in enable_channels.keys():
-        enable_channels[ch] = get_channel_name(ch)
-    set_interv_athour(post_Karen, 86400, 8, Karen_lines)
-    while True:
-        try:
-            for rtm in sc.rtm_read():
-                if rtm["type"] == "message":
-                    if "subtype" not in rtm and "text" in rtm:
-                        inCh = rtm["channel"] in enable_channels
-                        if inCh:
-                            response(rtm)
-                            add_respond(rtm)
-                            dis_channel(rtm)
-                            show_details(rtm)
-                            show_help(rtm)
-                            add_channel(rtm, inCh)
-                            add_rand_respond(rtm)
-                        else:
-                            add_channel(rtm, inCh)
-        except websocket._exceptions.WebSocketConnectionClosedException:
-            if sc.rtm_connect():
-                post_msg(random.choice([":nos: 再接続完了デース！", ":nos: 接続しなおしておきマシタ！"]), "C61K9HKDM")
-            else:
-                print("Connection Failed!")
-                break
-        time.sleep(1)
-else:
-    print("Connection Failed")
+    if sc.rtm_connect():
+        for ch in enable_channels.keys():
+            enable_channels[ch] = get_channel_name(ch)
+        set_interv_athour(post_Karen, 86400, 8, Karen_lines)
+        while True:
+            try:
+                for rtm in sc.rtm_read():
+                    if rtm["type"] == "message":
+                        if "subtype" not in rtm and "text" in rtm:
+                            inCh = rtm["channel"] in enable_channels
+                            if inCh:
+                                response(rtm)
+                                add_respond(rtm)
+                                dis_channel(rtm)
+                                show_details(rtm)
+                                show_help(rtm)
+                                add_channel(rtm, inCh)
+                                add_rand_respond(rtm)
+                            else:
+                                add_channel(rtm, inCh)
+            except websocket._exceptions.WebSocketConnectionClosedException:
+                if sc.rtm_connect():
+                    post_msg(random.choice([":nos: 再接続完了デース！", ":nos: 接続しなおしておきマシタ！"]), "C61K9HKDM")
+                else:
+                    print("Connection Failed!")
+                    break
+            time.sleep(0.5)
+    else:
+        print("Connection Failed")
