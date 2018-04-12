@@ -16,6 +16,7 @@ sc = SlackClient(slack_token)
 
 pat_ns_res = re.compile(r"nosetting respond", re.IGNORECASE)
 pat_ns_rnd = re.compile(r"nosetting randomres", re.IGNORECASE)
+pat_ns_rnd_add = re.compile(r"nosetting rand add", re.IGNORECASE)
 pat_ns_SC = re.compile(r"nosetting show Channels", re.IGNORECASE)
 pat_ns_SR = re.compile(r"nosetting show responses", re.IGNORECASE)
 pat_ns_AC = re.compile(r"nosetting addThisChannel", re.IGNORECASE)
@@ -101,6 +102,31 @@ def add_rand_respond(rtm):
         response_msg(rtm, "Success!")
 
 
+def modify_rand_respond(rtm):
+    if pat_ns_rnd_add.match(rtm["text"]):
+        string = pat_ns_rnd_add.sub("", rtm["text"], count=1)
+        list = re.split(r"\n", string)
+        if len(list) <= 1:
+            response_msg(rtm, "Error!")
+            return
+        for li in range(len(list)):
+            list[li] = pat_space.sub("", list[li])
+            list[li] = pat_space2.sub("", list[li])
+            if list[li] == "":
+                response_msg(rtm, "Error!")
+                return
+        mes = list.pop(0)
+        if mes not in enable_responses:
+            response_msg(rtm, "not exist such response.")
+            return
+        res = list
+        if isinstance(enable_responses[mes], str):
+            enable_responses[mes] = [enable_responses[mes]]
+        enable_responses[mes].extend(res)
+        dicjdump(enable_responses, "responses.json")
+        response_msg(rtm, "Success!")
+
+
 def show_details(rtm):
     if pat_ns_SC.match(rtm["text"]):
         ch_link = []
@@ -131,7 +157,7 @@ def dis_channel(rtm):
 
 def show_help(rtm):
     if pat_ns_help.match(rtm["text"]):
-        response_msg(rtm, "`nosetting respond A to B` : BにAと返す反応を追加します。\n" + "`nosetting randomres A \\n B\\n C\\n ...` : Aに対してB,C...をランダムに返す反応を追加します。\n"+"`nosetting addThisChannel` : そのチャンネルでこのbotを有効化します。\n"+"`nosetting disableThisChannel` : そのチャンネルでこのbotを無効化します。\n"+"`nosetting show Channels` : このbotが有効なチャンネルを表示します。\n"+"`nosetting show responses` : 設定されている反応を表示します。")
+        response_msg(rtm, "`nosetting respond A to B` : BにAと返す反応を追加します。\n" + "`nosetting randomres A \\n B\\n C\\n ...` : Aに対してB,C...をランダムに返す反応を追加します。\n"+"`nosetting rand add A \\n D\\n E\\n...` : Aに対してのランダムな反応のパターンを追加します。\n"+"`nosetting addThisChannel` : そのチャンネルでこのbotを有効化します。\n"+"`nosetting disableThisChannel` : そのチャンネルでこのbotを無効化します。\n"+"`nosetting show Channels` : このbotが有効なチャンネルを表示します。\n"+"`nosetting show responses` : 設定されている反応を表示します。")
 
 
 def get_channel_name(channelid):
@@ -213,6 +239,22 @@ def file2list(_file):
         ret = list(filed)
     return ret
 
+
+def main_process(rtm):
+    inCh = rtm["channel"] in enable_channels
+    if inCh:
+        response(rtm)
+        add_respond(rtm)
+        dis_channel(rtm)
+        show_details(rtm)
+        show_help(rtm)
+        add_channel(rtm, inCh)
+        add_rand_respond(rtm)
+        modify_rand_respond(rtm)
+    else:
+        add_channel(rtm, inCh)
+
+
 if __name__ == "__main__":
     enable_channels = j_file2dic("enable_channels.json")
     enable_responses = j_file2dic("responses.json")
@@ -227,17 +269,7 @@ if __name__ == "__main__":
                 for rtm in sc.rtm_read():
                     if rtm["type"] == "message":
                         if "subtype" not in rtm and "text" in rtm:
-                            inCh = rtm["channel"] in enable_channels
-                            if inCh:
-                                response(rtm)
-                                add_respond(rtm)
-                                dis_channel(rtm)
-                                show_details(rtm)
-                                show_help(rtm)
-                                add_channel(rtm, inCh)
-                                add_rand_respond(rtm)
-                            else:
-                                add_channel(rtm, inCh)
+                            main_process(rtm)
             except websocket._exceptions.WebSocketConnectionClosedException:
                 if sc.rtm_connect():
                     post_msg(random.choice([":nos: 再接続完了デース！", ":nos: 接続しなおしておきマシタ！"]), "C61K9HKDM")
