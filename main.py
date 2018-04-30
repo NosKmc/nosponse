@@ -17,10 +17,10 @@ sc = SlackClient(slack_token)
 pat_ns_res = re.compile(r"nosetting respond", re.IGNORECASE)
 pat_ns_rnd = re.compile(r"nosetting randomres", re.IGNORECASE)
 pat_ns_rnd_add = re.compile(r"nosetting rand add", re.IGNORECASE)
-pat_ns_SC = re.compile(r"nosetting show Channels", re.IGNORECASE)
+pat_ns_SC = re.compile(r"nosetting show channels", re.IGNORECASE)
 pat_ns_SR = re.compile(r"nosetting show responses", re.IGNORECASE)
-pat_ns_AC = re.compile(r"nosetting addThisChannel", re.IGNORECASE)
-pat_ns_DC = re.compile(r"nosetting disableThisChannel", re.IGNORECASE)
+pat_ns_AC = re.compile(r"nosetting enable", re.IGNORECASE)
+pat_ns_DC = re.compile(r"nosetting disable", re.IGNORECASE)
 pat_ns_help = re.compile(r"nosetting help", re.IGNORECASE)
 pat_space = re.compile(r"^\s+")
 pat_space2 = re.compile(r"\s+$")
@@ -33,6 +33,16 @@ def post_msg(msg, channel, unfurl=True):
         text=msg,
         icon_emoji=":mawarunos:",
         unfurl_links=unfurl,
+        username="nosponse"
+    )
+
+
+def post_attachment(text, channel):
+    sc.api_call(
+        "chat.postMessage",
+        channel=channel,
+        attachments=[{"text" : text}],
+        icon_emoji=":mawarunos:",
         username="nosponse"
     )
 
@@ -135,7 +145,7 @@ def show_details(rtm):
         response_msg(rtm, pprint.pformat(ch_link, indent=4))
     if pat_ns_SR.match(rtm["text"]):
         res = pprint.pformat(enable_responses, indent=4)
-        post_msg(escape_uid(res), rtm["channel"], unfurl=False)
+        post_attachment(escape_uid(res), rtm["channel"])
 
 
 def add_channel(rtm, inCh):
@@ -157,7 +167,7 @@ def dis_channel(rtm):
 
 def show_help(rtm):
     if pat_ns_help.match(rtm["text"]):
-        response_msg(rtm, "`nosetting respond A to B` : BにAと返す反応を追加します。\n" + "`nosetting randomres A \\n B\\n C\\n ...` : Aに対してB,C...をランダムに返す反応を追加します。\n"+"`nosetting rand add A \\n D\\n E\\n...` : Aに対してのランダムな反応のパターンを追加します。\n"+"`nosetting addThisChannel` : そのチャンネルでこのbotを有効化します。\n"+"`nosetting disableThisChannel` : そのチャンネルでこのbotを無効化します。\n"+"`nosetting show Channels` : このbotが有効なチャンネルを表示します。\n"+"`nosetting show responses` : 設定されている反応を表示します。")
+        response_msg(rtm, "`nosetting respond A to B` : BにAと返す反応を追加します。\n" + "`nosetting randomres A \\n B\\n C\\n ...` : Aに対してB,C...をランダムに返す反応を追加します。\n"+"`nosetting rand add A \\n D\\n E\\n...` : Aに対してのランダムな反応のパターンを追加します。\n"+"`nosetting enable` : そのチャンネルでこのbotを有効化します。\n"+"`nosetting disable` : そのチャンネルでこのbotを無効化します。\n"+"`nosetting show channels` : このbotが有効なチャンネルを表示します。\n"+"`nosetting show responses` : 設定されている反応を表示します。")
 
 
 def get_channel_name(channelid):
