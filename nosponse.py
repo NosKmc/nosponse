@@ -159,7 +159,7 @@ def show_details(rtm):
     if pat_ns_SR.match(rtm["text"]):
         #res = pprint.pformat(enable_responses, indent=4)
         #post_attachment(escape_uid(res), rtm["channel"])
-        response_msg(rtm, "現在こちらで見られるようにテスト中です\n https://inside.kmc.gr.jp/nostest/nosponse/")
+        response_msg(rtm, "現在こちらで見られるようにテスト中です\n https://inside.kmc.gr.jp/~nos/app/nosponse/")
 
 
 def add_channel(rtm, inCh):
