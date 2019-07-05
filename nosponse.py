@@ -162,16 +162,6 @@ def show_details(rtm):
         response_msg(rtm, "https://inside.kmc.gr.jp/~nos/app/nosponse/")
 
 
-def add_channel(rtm, inCh):
-    if pat_ns_AC.match(rtm["text"]):
-        enable_channels[rtm["channel"]] = get_channel_name(rtm["channel"])
-        dicjdump(enable_channels, "enable_channels.json")
-        if inCh:
-            response_msg(rtm, "Updated!")
-        else:
-            response_msg(rtm, "Success!")
-
-
 def show_help(rtm):
     if pat_ns_help.match(rtm["text"]):
         response_msg(rtm, "<@UCCQ7MNEQ> がinviteされているチャンネルで有効です。\n"\
