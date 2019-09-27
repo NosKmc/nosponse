@@ -15,6 +15,7 @@ from slackclient import SlackClient
 from slackclient import server
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
+import sqlite3
 
 slack_token = os.environ["SLACK_API_TOKEN"]
 sc = SlackClient(slack_token)
@@ -316,6 +317,18 @@ def main_process(rtm):
     add_rand_respond(text, channel)
     modify_rand_respond(text, channel)
 
+
+def load_responses(responses_db_path):
+    conn = sqlite3.connect(responses_db_path)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    c.execute('select * from response')
+    data = c.fetchall()
+    conn.close()
+    responses = dict()
+    for row in data:
+        responses[row['msg']] = responses.get(row['msg'], []) + [row['response']]
+    return responses
 
 if __name__ == "__main__":
     enable_responses = j_file2dic(responses_json_path)
