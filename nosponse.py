@@ -10,6 +10,7 @@ import pprint
 import websocket
 import threading
 import datetime
+import traceback
 from slackclient import SlackClient
 from slackclient import server
 from dotenv import load_dotenv, find_dotenv
@@ -330,7 +331,7 @@ if __name__ == "__main__":
                     time.sleep(100)
             except:
                 print(str(datetime.datetime.now()) + ":")
-                print(sys.exc_info()[0])
+                traceback.print_exc()
                 time.sleep(2)
                 if sc.rtm_connect():
                     post_msg(random.choice([":nos: 再接続完了デース！", ":nos: 接続しなおしておきマシタ！"]), nos_memo_id)
