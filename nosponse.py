@@ -329,7 +329,7 @@ if __name__ == "__main__":
                     print("Connection Failed!")
                     time.sleep(100)
             except:
-                print(str(datetime.datetime.now) + ":")
+                print(str(datetime.datetime.now()) + ":")
                 print(sys.exc_info()[0])
                 time.sleep(2)
                 if sc.rtm_connect():
