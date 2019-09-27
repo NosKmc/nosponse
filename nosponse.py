@@ -49,8 +49,8 @@ def response_msg(channel, msg):
     post_msg(msg, channel=channel)
 
 
-def post_rand_msg(rtm, lis):
-    post_msg(random.choice(lis), channel=rtm["channel"])
+def post_rand_msg(channel, lis):
+    post_msg(random.choice(lis), channel=channel)
 
 
 def response(rtm):
@@ -58,7 +58,7 @@ def response(rtm):
         if isinstance(enable_responses[rtm["text"]], str):
             response_msg(rtm["channel"], enable_responses[rtm["text"]])
         else:
-            post_rand_msg(rtm, enable_responses[rtm["text"]])
+            post_rand_msg(rtm["channel"], enable_responses[rtm["text"]])
 
 
 def extract_command(pattern, text):
