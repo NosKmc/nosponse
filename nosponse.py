@@ -148,6 +148,8 @@ def add_rand_respond(rtm):
     if len(res) == 0:
         response_msg(rtm["channel"], "Error!")
         return
+    mes = mes.strip()
+    res = [r.strip() for r in res]
     enable_responses[mes] = res
     dicjdump(enable_responses, responses_json_path)
     response_msg(rtm["channel"], "Success!")
@@ -166,6 +168,8 @@ def modify_rand_respond(rtm):
     if len(res) == 0:
         response_msg(rtm["channel"], "Error!")
         return
+    mes = mes.strip()
+    res = [r.strip() for r in res]
     if mes not in enable_responses:
         response_msg(rtm["channel"], "not exist such response.")
         return
