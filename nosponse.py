@@ -299,6 +299,7 @@ def file2list(_file):
 def main_process(rtm):
     response(rtm)
     add_respond(rtm)
+    delete_response(rtm)
     show_details(rtm)
     show_help(rtm)
     add_rand_respond(rtm)
