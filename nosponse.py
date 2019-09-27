@@ -11,6 +11,7 @@ import websocket
 import threading
 import datetime
 from slackclient import SlackClient
+from slackclient import server
 
 slack_token = os.environ["SLACK_API_TOKEN"]
 sc = SlackClient(slack_token)
@@ -280,6 +281,12 @@ if __name__ == "__main__":
                     if rtm["type"] == "message":
                         if "subtype" not in rtm and "text" in rtm:
                             main_process(rtm)
+            except server.SlackConnectionError:
+                if sc.rtm_connect():
+                    pass
+                else:
+                    print("Connection Failed!")
+                    time.sleep(100)
             except:
                 print(str(datetime.datetime.now) + ":")
                 print(sys.exc_info()[0])
