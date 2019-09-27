@@ -61,9 +61,7 @@ def post_rand_msg(channel, lis):
     post_msg(random.choice(lis), channel=channel)
 
 
-def response(rtm):
-    text = rtm["text"]
-    channel = rtm["channel"]
+def response(text, channel):
     if text in enable_responses:
         if isinstance(enable_responses[text], str):
             response_msg(channel, enable_responses[text])
@@ -81,9 +79,7 @@ def extract_command(pattern, text):
 # - [x] deleteコマンドを追加する
 # - [ ] rtm使うのやめてtextだけにする
 
-def add_respond(rtm):
-    text = rtm["text"]
-    channel = rtm["channel"]
+def add_respond(text, channel):
     if not pat_ns_res.match(text):
         return
     # (nosetting|@nosponse) respondを取り除いてる
@@ -104,9 +100,7 @@ def add_respond(rtm):
     response_msg(channel, "Success!")
 
 
-def delete_response(rtm):
-    text = rtm["text"]
-    channel = rtm["channel"]
+def delete_response(text, channel):
     if not pat_ns_delete.match(text):
         return
     command = extract_command(pat_ns_delete, text)
@@ -142,9 +136,7 @@ mes = list.pop(0)
 res = list
 """
 
-def add_rand_respond(rtm):
-    text = rtm["text"]
-    channel = rtm["channel"]
+def add_rand_respond(text, channel):
     if not pat_ns_rnd.match(text):
         return
     command = extract_command(pat_ns_rnd, text)
@@ -163,9 +155,7 @@ def add_rand_respond(rtm):
     response_msg(channel, "Success!")
 
 
-def modify_rand_respond(rtm):
-    text = rtm["text"]
-    channel = rtm["channel"]
+def modify_rand_respond(text, channel):
     if not pat_ns_rnd_add.match(text):
         return
     command = extract_command(pat_ns_rnd_add, text)
@@ -203,9 +193,7 @@ def get_joining_channels():
     return channels
 
 
-def show_details(rtm):
-    text = rtm["text"]
-    channel = rtm["channel"]
+def show_details(text, channel):
     if pat_ns_SC.match(text):
         ch_link = []
         channels = get_joining_channels()
@@ -218,9 +206,7 @@ def show_details(rtm):
         response_msg(channel, "https://inside.kmc.gr.jp/~nos/app/nosponse/")
 
 
-def show_help(rtm):
-    text = rtm["text"]
-    channel = rtm["channel"]
+def show_help(text, channel):
     if not pat_ns_help.match(text):
         return
     response_msg(channel, "<@UCCQ7MNEQ> がinviteされているチャンネルで有効です。\n"\
@@ -320,13 +306,15 @@ def file2list(_file):
 
 
 def main_process(rtm):
-    response(rtm)
-    add_respond(rtm)
-    delete_response(rtm)
-    show_details(rtm)
-    show_help(rtm)
-    add_rand_respond(rtm)
-    modify_rand_respond(rtm)
+    text = rtm["text"]
+    channel = rtm["channel"]
+    response(text, channel)
+    add_respond(text, channel)
+    delete_response(text, channel)
+    show_details(text, channel)
+    show_help(text, channel)
+    add_rand_respond(text, channel)
+    modify_rand_respond(text, channel)
 
 
 if __name__ == "__main__":
