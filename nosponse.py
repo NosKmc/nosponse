@@ -101,7 +101,7 @@ def add_respond(rtm):
 
 
 def delete_response(rtm):
-    if not pat_ns_delete_res.match(rtm["text"]):
+    if not pat_ns_delete.match(rtm["text"]):
         return
     command = extract_command(pat_ns_delete, rtm["text"])
     mes = command.strip()
