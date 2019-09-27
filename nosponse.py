@@ -15,6 +15,8 @@ from slackclient import server
 
 slack_token = os.environ["SLACK_API_TOKEN"]
 sc = SlackClient(slack_token)
+nos_memo_id = "C61K9HKDM"
+bot_uid = "UCCQ7MNEQ"
 
 pat_ns_res = re.compile(r"(nosetting|<@UCCQ7MNEQ>) respond", re.IGNORECASE)
 pat_ns_delete = re.compile(r"(nosetting|<@UCCQ7MNEQ>) delete", re.IGNORECASE)
@@ -172,7 +174,7 @@ def modify_rand_respond(rtm):
 def get_joining_channels():
     res = sc.api_call(
         "users.conversations",
-        user="UCCQ7MNEQ"
+        user=bot_uid
     )
     if not res["ok"]:
         return "get channels Failed"
@@ -253,7 +255,7 @@ def escape_uid(text):
 
 
 def post_Karen(Karen_lines):
-    post_msg(random.choice(Karen_lines), "C61K9HKDM")
+    post_msg(random.choice(Karen_lines), nos_memo_id)
 
 
 def set_interval(func, delay, sleep_time, *param):
@@ -326,7 +328,7 @@ if __name__ == "__main__":
                 print(sys.exc_info()[0])
                 time.sleep(2)
                 if sc.rtm_connect():
-                    post_msg(random.choice([":nos: 再接続完了デース！", ":nos: 接続しなおしておきマシタ！"]), "C61K9HKDM")
+                    post_msg(random.choice([":nos: 再接続完了デース！", ":nos: 接続しなおしておきマシタ！"]), nos_memo_id)
                 else:
                     print("Connection Failed!")
                     time.sleep(100)
