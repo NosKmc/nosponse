@@ -17,6 +17,7 @@ slack_token = os.environ["SLACK_API_TOKEN"]
 sc = SlackClient(slack_token)
 nos_memo_id = "C61K9HKDM"
 bot_uid = "UCCQ7MNEQ"
+responses_json_path = "responses.json"
 
 pat_ns_res = re.compile(r"(nosetting|<@UCCQ7MNEQ>) respond", re.IGNORECASE)
 pat_ns_delete = re.compile(r"(nosetting|<@UCCQ7MNEQ>) delete", re.IGNORECASE)
@@ -91,7 +92,7 @@ def add_respond(rtm):
         response_msg(rtm["channel"], "Error!")
         return
     enable_responses[mes] = res
-    dicjdump(enable_responses, "responses.json")
+    dicjdump(enable_responses, responses_json_path)
     response_msg(rtm["channel"], "Success!")
 
 
@@ -103,7 +104,7 @@ def delete_response(rtm):
     if mes in enable_responses:
         del enable_responses[mes]
         response_msg(rtm["channel"], "Deleted the response!")
-        dicjdump(enable_responses, "responses.json")
+        dicjdump(enable_responses, responses_json_path)
     else:
         response_msg(rtm["channel"], "Error!")
     
@@ -144,7 +145,7 @@ def add_rand_respond(rtm):
         response_msg(rtm["channel"], "Error!")
         return
     enable_responses[mes] = res
-    dicjdump(enable_responses, "responses.json")
+    dicjdump(enable_responses, responses_json_path)
     response_msg(rtm["channel"], "Success!")
 
 
@@ -167,7 +168,7 @@ def modify_rand_respond(rtm):
     if isinstance(enable_responses[mes], str):
         enable_responses[mes] = [enable_responses[mes]]
     enable_responses[mes].extend(res)
-    dicjdump(enable_responses, "responses.json")
+    dicjdump(enable_responses, responses_json_path)
     response_msg(rtm["channel"], "Success!")
 
 
@@ -307,7 +308,7 @@ def main_process(rtm):
 
 
 if __name__ == "__main__":
-    enable_responses = j_file2dic("responses.json")
+    enable_responses = j_file2dic(responses_json_path)
     Karen_lines = file2list("Karen_morning.txt")
 
     if sc.rtm_connect():
