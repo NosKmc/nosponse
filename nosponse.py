@@ -19,8 +19,8 @@ slack_token = os.environ["SLACK_API_TOKEN"]
 sc = SlackClient(slack_token)
 nos_memo_id = "C61K9HKDM"
 bot_uid = "UCCQ7MNEQ"
-responses_json_path = "responses.json"
-karen_text_path = "Karen_morning.txt"
+responses_json_path = "../responses.json"
+karen_text_path = "../Karen_morning.txt"
 
 pat_ns_res = re.compile(r"(nosetting|<@UCCQ7MNEQ>) respond", re.IGNORECASE)
 pat_ns_delete = re.compile(r"(nosetting|<@UCCQ7MNEQ>) delete", re.IGNORECASE)
