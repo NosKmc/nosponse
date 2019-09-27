@@ -17,6 +17,7 @@ slack_token = os.environ["SLACK_API_TOKEN"]
 sc = SlackClient(slack_token)
 
 pat_ns_res = re.compile(r"(nosetting|<@UCCQ7MNEQ>) respond", re.IGNORECASE)
+pat_ns_delete = re.compile(r"(nosetting|<@UCCQ7MNEQ>) delete", re.IGNORECASE)
 pat_ns_rnd = re.compile(r"(nosetting|<@UCCQ7MNEQ>) randomres", re.IGNORECASE)
 pat_ns_rnd_add = re.compile(r"(nosetting|<@UCCQ7MNEQ>) rand add", re.IGNORECASE)
 pat_ns_SC = re.compile(r"(nosetting|<@UCCQ7MNEQ>) show channels", re.IGNORECASE)
@@ -68,7 +69,7 @@ def extract_command(pattern, text):
 # - [ ] (nosetting|@nosponse) respondを取り除いてresとmesに分けてるところをextract_commandを使うようにする
 # - [ ] if not hoge: return で抜けられるなら抜けるようにする
 # - [ ] 変数名分かりにくかったらいい感じにする
-# - [ ] deleteコマンドを追加する
+# - [x] deleteコマンドを追加する
 # - [ ] rtm使うのやめてtextだけにする
 
 def add_respond(rtm):
@@ -100,6 +101,19 @@ def add_respond(rtm):
     dicjdump(enable_responses, "responses.json")
     response_msg(rtm["channel"], "Success!")
 
+
+def delete_response(rtm):
+    if not pat_ns_delete_res.match(rtm["text"]):
+        return
+    command = extract_command(pat_ns_delete, rtm["text"])
+    mes = command.strip()
+    if mes in enable_responses:
+        del enable_responses[mes]
+        response_msg(rtm["channel"], "Deleted the response!")
+        dicjdump(enable_responses, "responses.json")
+    else:
+        response_msg(rtm["channel"], "Error!")
+    
 """
 @nosponse randomres A
 B
