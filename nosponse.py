@@ -88,15 +88,6 @@ def add_respond(rtm):
     if mes == "":
         response_msg(rtm["channel"], "Error!")
         return
-    # 削除処理
-    if res == "":
-        if mes in enable_responses:
-            del enable_responses[mes]
-            response_msg(rtm["channel"], "Deleted the response!")
-            dicjdump(enable_responses, "responses.json")
-            return
-        response_msg(rtm["channel"], "Error!")
-        return
     enable_responses[mes] = res
     dicjdump(enable_responses, "responses.json")
     response_msg(rtm["channel"], "Success!")
