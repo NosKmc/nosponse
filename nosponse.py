@@ -200,6 +200,7 @@ def show_help(rtm):
         return
     response_msg(rtm["channel"], "<@UCCQ7MNEQ> がinviteされているチャンネルで有効です。\n"\
     "`(nosetting|<@UCCQ7MNEQ>) respond A to B` : BにAと返す反応を追加します。\n"\
+    "`(nosetting|<@UCCQ7MNEQ>) delete A` : Aへの反応を削除します。\n"\
     "`(nosetting|<@UCCQ7MNEQ>) randomres A \\n B\\n C\\n ...` : Aに対してB,C...をランダムに返す反応を追加します。\n"\
     "`(nosetting|<@UCCQ7MNEQ>) rand add A \\n D\\n E\\n...` : Aに対してのランダムな反応のパターンを追加します。\n"\
     "`(nosetting|<@UCCQ7MNEQ>) show channels` : このbotが有効なチャンネルを表示します。\n"\
