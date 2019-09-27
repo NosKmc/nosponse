@@ -18,6 +18,7 @@ sc = SlackClient(slack_token)
 nos_memo_id = "C61K9HKDM"
 bot_uid = "UCCQ7MNEQ"
 responses_json_path = "responses.json"
+karen_text_path = "Karen_morning.txt"
 
 pat_ns_res = re.compile(r"(nosetting|<@UCCQ7MNEQ>) respond", re.IGNORECASE)
 pat_ns_delete = re.compile(r"(nosetting|<@UCCQ7MNEQ>) delete", re.IGNORECASE)
@@ -309,7 +310,7 @@ def main_process(rtm):
 
 if __name__ == "__main__":
     enable_responses = j_file2dic(responses_json_path)
-    Karen_lines = file2list("Karen_morning.txt")
+    Karen_lines = file2list(karen_text_path)
 
     if sc.rtm_connect():
         set_interv_athour(post_Karen, 86400, 8, Karen_lines)
