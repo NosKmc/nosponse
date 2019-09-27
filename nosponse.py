@@ -302,6 +302,12 @@ def set_interv_athour(func, delay, at_hour, _param):  # 諸事情によりパラ
     set_interval(func, delay, sleeptime, _param)
 
 
+def j_file2dic(_file):
+    with open(_file, "r", encoding="utf-8") as filed:
+        dic = json.load(filed)
+    return dic
+
+
 def file2list(_file):
     with open(_file, "r", encoding="utf-8") as filed:
         ret = list(filed)
