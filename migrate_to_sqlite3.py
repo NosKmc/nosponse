@@ -22,9 +22,6 @@ def main():
         c = conn.cursor()
         c.execute('CREATE TABLE response (msg, response)')
     for msg, res in json_data.items():
-        with sqlite3.connect(DB_PATH) as conn:
-            c = conn.cursor()
-            c.execute('insert into message values (?)', [msg])
         res = response_to_list(res)
         responses = [(msg, r) for r in res]
         with sqlite3.connect(DB_PATH) as conn:
