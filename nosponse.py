@@ -62,55 +62,61 @@ def post_rand_msg(channel, lis):
 
 
 def response(rtm):
-    if rtm["text"] in enable_responses:
-        if isinstance(enable_responses[rtm["text"]], str):
-            response_msg(rtm["channel"], enable_responses[rtm["text"]])
+    text = rtm["text"]
+    channel = rtm["channel"]
+    if text in enable_responses:
+        if isinstance(enable_responses[text], str):
+            response_msg(channel, enable_responses[text])
         else:
-            post_rand_msg(rtm["channel"], enable_responses[rtm["text"]])
+            post_rand_msg(channel, enable_responses[text])
 
 
 def extract_command(pattern, text):
     return pattern.sub("", text, count=1)
 
 # やってみるとどうか
-# - [ ] (nosetting|@nosponse) respondを取り除いてresとmesに分けてるところをextract_commandを使うようにする
-# - [ ] if not hoge: return で抜けられるなら抜けるようにする
+# - [x] (nosetting|@nosponse) respondを取り除いてresとmesに分けてるところをextract_commandを使うようにする
+# - [x] if not hoge: return で抜けられるなら抜けるようにする
 # - [ ] 変数名分かりにくかったらいい感じにする
 # - [x] deleteコマンドを追加する
 # - [ ] rtm使うのやめてtextだけにする
 
 def add_respond(rtm):
-    if not pat_ns_res.match(rtm["text"]):
+    text = rtm["text"]
+    channel = rtm["channel"]
+    if not pat_ns_res.match(text):
         return
     # (nosetting|@nosponse) respondを取り除いてる
-    command = extract_command(pat_ns_res, rtm["text"])
+    command = extract_command(pat_ns_res, text)
     try:
         res, mes = re.split(r" to ", command, maxsplit=1, flags=re.IGNORECASE)
     except ValueError as e:
-        response_msg(rtm["channel"], "Error!")
+        response_msg(channel, "Error!")
         return
 
     res = res.strip()
     mes = mes.strip()
     if mes == "":
-        response_msg(rtm["channel"], "Error!")
+        response_msg(channel, "Error!")
         return
     enable_responses[mes] = res
     dicjdump(enable_responses, responses_json_path)
-    response_msg(rtm["channel"], "Success!")
+    response_msg(channel, "Success!")
 
 
 def delete_response(rtm):
-    if not pat_ns_delete.match(rtm["text"]):
+    text = rtm["text"]
+    channel = rtm["channel"]
+    if not pat_ns_delete.match(text):
         return
-    command = extract_command(pat_ns_delete, rtm["text"])
+    command = extract_command(pat_ns_delete, text)
     mes = command.strip()
     if mes in enable_responses:
         del enable_responses[mes]
-        response_msg(rtm["channel"], "Deleted the response!")
+        response_msg(channel, "Deleted the response!")
         dicjdump(enable_responses, responses_json_path)
     else:
-        response_msg(rtm["channel"], "Error!")
+        response_msg(channel, "Error!")
     
 """
 @nosponse randomres A
@@ -125,59 +131,63 @@ D (responses)
 """
 """
 if len(list) <= 2:
-    response_msg(rtm["channel"], "Error!")
+    response_msg(channel, "Error!")
     return
 for li in range(len(list)):
     list[li] = list[li].strip()
     if list[li] == "":
-        response_msg(rtm["channel"], "Error!")
+        response_msg(channel, "Error!")
         return
 mes = list.pop(0)
 res = list
 """
 
 def add_rand_respond(rtm):
-    if not pat_ns_rnd.match(rtm["text"]):
+    text = rtm["text"]
+    channel = rtm["channel"]
+    if not pat_ns_rnd.match(text):
         return
-    command = extract_command(pat_ns_rnd, rtm["text"])
+    command = extract_command(pat_ns_rnd, text)
     try:
         mes, *res = command.split("\n")
     except ValueError as e:
-        response_msg(rtm["channel"], "Error!")
+        response_msg(channel, "Error!")
         return
     if len(res) == 0:
-        response_msg(rtm["channel"], "Error!")
+        response_msg(channel, "Error!")
         return
     mes = mes.strip()
     res = [r.strip() for r in res]
     enable_responses[mes] = res
     dicjdump(enable_responses, responses_json_path)
-    response_msg(rtm["channel"], "Success!")
+    response_msg(channel, "Success!")
 
 
 def modify_rand_respond(rtm):
-    if not pat_ns_rnd_add.match(rtm["text"]):
+    text = rtm["text"]
+    channel = rtm["channel"]
+    if not pat_ns_rnd_add.match(text):
         return
-    command = extract_command(pat_ns_rnd_add, rtm["text"])
+    command = extract_command(pat_ns_rnd_add, text)
     mes, *res = command.split("\n")
     try:
         mes, *res = command.split("\n")
     except ValueError as e:
-        response_msg(rtm["channel"], "Error!")
+        response_msg(channel, "Error!")
         return
     if len(res) == 0:
-        response_msg(rtm["channel"], "Error!")
+        response_msg(channel, "Error!")
         return
     mes = mes.strip()
     res = [r.strip() for r in res]
     if mes not in enable_responses:
-        response_msg(rtm["channel"], "not exist such response.")
+        response_msg(channel, "not exist such response.")
         return
     if isinstance(enable_responses[mes], str):
         enable_responses[mes] = [enable_responses[mes]]
     enable_responses[mes].extend(res)
     dicjdump(enable_responses, responses_json_path)
-    response_msg(rtm["channel"], "Success!")
+    response_msg(channel, "Success!")
 
 
 def get_joining_channels():
@@ -194,22 +204,26 @@ def get_joining_channels():
 
 
 def show_details(rtm):
-    if pat_ns_SC.match(rtm["text"]):
+    text = rtm["text"]
+    channel = rtm["channel"]
+    if pat_ns_SC.match(text):
         ch_link = []
         channels = get_joining_channels()
         for ch in channels.keys():
             ch_link.append("<#" + ch + "|" + channels[ch]+">")
-        response_msg(rtm["channel"], pprint.pformat(ch_link, indent=4))
-    elif pat_ns_SR.match(rtm["text"]):
+        response_msg(channel, pprint.pformat(ch_link, indent=4))
+    elif pat_ns_SR.match(text):
         #res = pprint.pformat(enable_responses, indent=4)
         #post_attachment(escape_uid(res), rtm["channel"])
-        response_msg(rtm["channel"], "https://inside.kmc.gr.jp/~nos/app/nosponse/")
+        response_msg(channel, "https://inside.kmc.gr.jp/~nos/app/nosponse/")
 
 
 def show_help(rtm):
-    if not pat_ns_help.match(rtm["text"]):
+    text = rtm["text"]
+    channel = rtm["channel"]
+    if not pat_ns_help.match(text):
         return
-    response_msg(rtm["channel"], "<@UCCQ7MNEQ> がinviteされているチャンネルで有効です。\n"\
+    response_msg(channel, "<@UCCQ7MNEQ> がinviteされているチャンネルで有効です。\n"\
     "`(nosetting|<@UCCQ7MNEQ>) respond A to B` : BにAと返す反応を追加します。\n"\
     "`(nosetting|<@UCCQ7MNEQ>) delete A` : Aへの反応を削除します。\n"\
     "`(nosetting|<@UCCQ7MNEQ>) randomres A \\n B\\n C\\n ...` : Aに対してB,C...をランダムに返す反応を追加します。\n"\
