@@ -12,6 +12,8 @@ import threading
 import datetime
 from slackclient import SlackClient
 from slackclient import server
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
 
 slack_token = os.environ["SLACK_API_TOKEN"]
 sc = SlackClient(slack_token)
