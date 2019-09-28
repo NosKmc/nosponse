@@ -1,3 +1,6 @@
 .env
 responses.json
 *.sqlite3
+*.sh
+__pycache__/
+nohup.out
