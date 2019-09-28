@@ -15,12 +15,14 @@ from slackclient import SlackClient
 from slackclient import server
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
+import sqlite3
 
 slack_token = os.environ["SLACK_API_TOKEN"]
 sc = SlackClient(slack_token)
 nos_memo_id = "C61K9HKDM"
 bot_uid = "UCCQ7MNEQ"
 responses_json_path = "../responses.json"
+responses_db_path = "responses.sqlite3"
 karen_text_path = "../Karen_morning.txt"
 
 pat_ns_res = re.compile(r"(nosetting|<@UCCQ7MNEQ>) respond", re.IGNORECASE)
@@ -72,6 +74,16 @@ def response(text, channel):
 def extract_command(pattern, text):
     return pattern.sub("", text, count=1)
 
+def add_new_responses_to_db(db_path, ress):
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.executemany('insert into response values (?, ?)', ress)
+
+def delete_response_from_db(db_path, msg):
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute('delete from response where msg = ?', (msg,))
+
 # やってみるとどうか
 # - [x] (nosetting|@nosponse) respondを取り除いてresとmesに分けてるところをextract_commandを使うようにする
 # - [x] if not hoge: return で抜けられるなら抜けるようにする
@@ -96,7 +108,7 @@ def add_respond(text, channel):
         response_msg(channel, "Error!")
         return
     enable_responses[mes] = res
-    dicjdump(enable_responses, responses_json_path)
+    add_new_responses_to_db(responses_db_path, [(mes, res)])
     response_msg(channel, "Success!")
 
 
@@ -108,7 +120,7 @@ def delete_response(text, channel):
     if mes in enable_responses:
         del enable_responses[mes]
         response_msg(channel, "Deleted the response!")
-        dicjdump(enable_responses, responses_json_path)
+        delete_response_from_db(responses_db_path, mes)
     else:
         response_msg(channel, "Error!")
     
@@ -151,7 +163,8 @@ def add_rand_respond(text, channel):
     mes = mes.strip()
     res = [r.strip() for r in res]
     enable_responses[mes] = res
-    dicjdump(enable_responses, responses_json_path)
+    ress = [(mes, r) for r in res]
+    add_new_responses_to_db(responses_db_path, ress)
     response_msg(channel, "Success!")
 
 
@@ -176,7 +189,8 @@ def modify_rand_respond(text, channel):
     if isinstance(enable_responses[mes], str):
         enable_responses[mes] = [enable_responses[mes]]
     enable_responses[mes].extend(res)
-    dicjdump(enable_responses, responses_json_path)
+    ress = [(mes, r) for r in res]
+    add_new_responses_to_db(responses_db_path, ress)
     response_msg(channel, "Success!")
 
 
@@ -294,11 +308,6 @@ def j_file2dic(_file):
     return dic
 
 
-def dicjdump(dic, _file):
-    with open(_file, "w", encoding="utf-8") as filed:
-        json.dump(dic, filed, indent=4, ensure_ascii=False)
-
-
 def file2list(_file):
     with open(_file, "r", encoding="utf-8") as filed:
         ret = list(filed)
@@ -317,8 +326,20 @@ def main_process(rtm):
     modify_rand_respond(text, channel)
 
 
+def load_responses(responses_db_path):
+    conn = sqlite3.connect(responses_db_path)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    c.execute('select * from response')
+    data = c.fetchall()
+    conn.close()
+    responses = dict()
+    for row in data:
+        responses[row['msg']] = responses.get(row['msg'], []) + [row['response']]
+    return responses
+
 if __name__ == "__main__":
-    enable_responses = j_file2dic(responses_json_path)
+    enable_responses = load_responses(responses_db_path)
     Karen_lines = file2list(karen_text_path)
 
     if sc.rtm_connect():
