@@ -14,7 +14,7 @@ def response_to_list(response):
         return [response]
 
 def load_responses():
-    return nosponse.j_file2dic(noseponse.responses_json_path)
+    return nosponse.j_file2dic(nosponse.responses_json_path)
 
 def main():
     json_data = load_responses()
