@@ -55,6 +55,16 @@ def post_attachment(text, channel):
         username="nosponse"
     )
 
+def post_blocks(blocks, channel):
+    sc.api_call(
+        "chat.postMessage",
+        channel=channel,
+        blocks=blocks,
+        icon_emoji=":mawarunos:",
+        unfurl_links=unfurl,
+        username="nosponse"
+    )
+
 def make_block_template(triggers, responses):
     blocks = [{
 		"type": "section",
@@ -72,8 +82,8 @@ def make_block_template(triggers, responses):
 	})
     blocks.append({
 		"type": "divider"
-	},
-    {
+	})
+    blocks.append({
 		"type": "section",
 		"text": {
 			"type": "mrkdwn",
@@ -191,8 +201,12 @@ def search_responses(text, channel):
     answers = ['トリガー:'] + messages + [''] + ['反応:'] + responses
     answer_text = '\n'.join(answers)
     answer_text = escape_uid(answer_text)
-    """
     response_msg(channel, answer_text)
+    """
+    blocks = make_block_template(messages, responses)
+    answer_blocks = json.dumps(blocks)
+    answer_blocks = escape_uid(answer_blocks)
+    post_blocks(answer_blocks, channel)
 
 """
 @nosponse randomres A
