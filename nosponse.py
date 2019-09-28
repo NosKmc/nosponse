@@ -73,12 +73,13 @@ def make_block_template(triggers, responses):
 		}
 	}]
     if not len(triggers) == 0:
-        blocks.append({
-            "type": "section",
-            "fields": [{
+        trigger_field = [{
                     "type": "mrkdwn",
                     "text": trig,
                 } for trig in triggers]
+        blocks.append({
+            "type": "section",
+            "fields": trigger_field
         })
     blocks.append({
 		"type": "divider"
@@ -91,12 +92,13 @@ def make_block_template(triggers, responses):
 		}
 	})
     if not len(responses) == 0:
-        blocks.append({
-            "type": "section",
-            "fields": [{
+        responses_field = [{
                     "type": "mrkdwn",
                     "text": resp,
                 } for resp in responses]
+        blocks.append({
+            "type": "section",
+            "fields": responses_field
         })
     return blocks
 
