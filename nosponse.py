@@ -64,6 +64,22 @@ def post_blocks(blocks, channel):
         username="nosponse"
     )
 
+def split_with_count(xs, n):
+    """
+    リストxsをn個ごとの要素のリストのリストに分割する
+    split_with_count(list(range(7)), 3) -> [[0, 1, 2], [3, 4, 5], [6]]
+    """
+    ret = []
+    ys = []
+    for x in xs:
+        ys.append(x)
+        if len(ys) == n:
+            ret.append(ys)
+            ys = []
+    if ys:
+        ret.append(ys)
+    return ret
+
 def make_block_template(triggers, responses):
     blocks = [{
 		"type": "section",
@@ -73,14 +89,18 @@ def make_block_template(triggers, responses):
 		}
 	}]
     if not len(triggers) == 0:
+        # Slackの仕様で1つのsectionに要素10個しか入れられない
+        max_element_count = 10
         trigger_field = [{
-                    "type": "mrkdwn",
-                    "text": trig,
-                } for trig in triggers]
-        blocks.append({
-            "type": "section",
-            "fields": trigger_field
-        })
+            "type": "mrkdwn",
+            "text": trig,
+        } for trig in triggers]
+        fields = split_with_count(trigger_field, max_element_count)
+        for field in fields:
+            blocks.append({
+                "type": "section",
+                "fields": field
+            })
     blocks.append({
 		"type": "divider"
 	})
