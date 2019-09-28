@@ -140,7 +140,7 @@ def delete_response(text, channel):
 def search_responses(text, channel):
     if not pat_ns_search.match(text):
         return
-    command = extract_command(pat_ns_delete, text)
+    command = extract_command(pat_ns_search, text)
     query = command.strip()
     messages = search_responses_from_db(responses_db_path, query)
     if len(messages) == 0:
