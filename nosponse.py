@@ -99,11 +99,11 @@ def search_responses_from_db(db_path, query):
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute('''
-            select distinct response from response
+            select msg, response from response
             where response like '%' || ? || '%'
         ''', (query,))
         rows = c.fetchall()
-        return [x[0] for x in rows]
+        return [x[0] + ' -> ' + x[1] for x in rows]
 
 # やってみるとどうか
 # - [x] (nosetting|@nosponse) respondを取り除いてresとmesに分けてるところをextract_commandを使うようにする
