@@ -55,6 +55,33 @@ def post_attachment(text, channel):
         username="nosponse"
     )
 
+def make_block_template(triggers, responses):
+    blocks = [{
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "*トリガー*"
+		}
+	}]
+    blocks.append({
+		"type": "section",
+		"fields": [{
+				"type": "mrkdwn",
+				"text": trig,
+			} for trig in triggers]
+	})
+    blocks.append({
+		"type": "divider"
+	})
+    blocks.append({
+		"type": "section",
+		"fields": [{
+				"type": "mrkdwn",
+				"text": resp,
+			} for resp in responses]
+	})
+    return blocks
+
 
 def response_msg(channel, msg):
     post_msg(msg, channel=channel)
