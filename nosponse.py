@@ -72,6 +72,13 @@ def make_block_template(triggers, responses):
 	})
     blocks.append({
 		"type": "divider"
+	},
+    {
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "*反応*"
+		}
 	})
     blocks.append({
 		"type": "section",
@@ -180,9 +187,11 @@ def search_responses(text, channel):
     query = command.strip()
     messages = search_messages_from_db(responses_db_path, query)
     responses = search_responses_from_db(responses_db_path, query)
+    """
     answers = ['トリガー:'] + messages + [''] + ['反応:'] + responses
     answer_text = '\n'.join(answers)
     answer_text = escape_uid(answer_text)
+    """
     response_msg(channel, answer_text)
 
 """
