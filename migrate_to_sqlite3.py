@@ -9,7 +9,7 @@ def response_to_list(response):
     B=C -> [C]
     """
     if isinstance(response, list):
-        return list(response)
+        return response
     else:
         return [response]
 
