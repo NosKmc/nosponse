@@ -112,14 +112,17 @@ def make_block_template(triggers, responses):
 		}
 	})
     if not len(responses) == 0:
+        max_element_count = 10
         responses_field = [{
                     "type": "mrkdwn",
                     "text": resp,
                 } for resp in responses]
-        blocks.append({
-            "type": "section",
-            "fields": responses_field
-        })
+        fields = split_with_count(responses_field, max_element_count)
+        for field in fields:
+            blocks.append({
+                "type": "section",
+                "fields": field
+            })
     return blocks
 
 
