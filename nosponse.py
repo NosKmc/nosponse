@@ -138,7 +138,7 @@ def delete_response(text, channel):
     
     
 def search_responses(text, channel):
-    if not pat_ns_search(text):
+    if not pat_ns_search.match(text):
         return
     command = extract_command(pat_ns_delete, text)
     query = command.strip()
