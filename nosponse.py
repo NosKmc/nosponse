@@ -61,7 +61,6 @@ def post_blocks(blocks, channel):
         channel=channel,
         blocks=blocks,
         icon_emoji=":mawarunos:",
-        unfurl_links=unfurl,
         username="nosponse"
     )
 
