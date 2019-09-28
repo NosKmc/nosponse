@@ -155,6 +155,7 @@ def search_responses(text, channel):
     responses = search_responses_from_db(responses_db_path, query)
     answers = ['トリガー:'] + messages + [''] + ['反応:'] + responses
     answer_text = '\n'.join(answers)
+    answer_text = escape_uid(answer_text)
     response_msg(channel, answer_text)
 
 """
