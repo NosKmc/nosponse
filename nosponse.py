@@ -32,6 +32,7 @@ pat_ns_rnd_add = re.compile(r"(nosetting|<@UCCQ7MNEQ>) rand add", re.IGNORECASE)
 pat_ns_SC = re.compile(r"(nosetting|<@UCCQ7MNEQ>) show channels", re.IGNORECASE)
 pat_ns_SR = re.compile(r"(nosetting|<@UCCQ7MNEQ>) show responses", re.IGNORECASE)
 pat_ns_help = re.compile(r"(nosetting|<@UCCQ7MNEQ>) help", re.IGNORECASE)
+pat_ns_search = re.compile(r"(nosetting|<@UCCQ7MNEQ>) search", re.IGNORECASE)
 
 
 def post_msg(msg, channel, unfurl=True):
@@ -84,6 +85,17 @@ def delete_response_from_db(db_path, msg):
         c = conn.cursor()
         c.execute('delete from response where msg = ?', (msg,))
 
+def search_responses_from_db(db_path, query):
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute('''
+            select distinct msg from response
+            where msg like '%' || ? || '%'
+        ''', (query,))
+        rows = c.fetchall()
+        return [x[0] for x in rows]
+
+
 # やってみるとどうか
 # - [x] (nosetting|@nosponse) respondを取り除いてresとmesに分けてるところをextract_commandを使うようにする
 # - [x] if not hoge: return で抜けられるなら抜けるようにする
@@ -124,6 +136,19 @@ def delete_response(text, channel):
     else:
         response_msg(channel, "Error!")
     
+    
+def search_responses(text, channel):
+    if not pat_ns_search(text):
+        return
+    command = extract_command(pat_ns_delete, text)
+    query = command.strip()
+    messages = search_responses_from_db(responses_db_path, query)
+    if len(message) == 0:
+        response_msg(channel, "Not found")
+    else:
+        answer = '\n'.join(messages)
+        response_msg(channel, answer)
+
 """
 @nosponse randomres A
 B
@@ -218,6 +243,7 @@ def show_details(text, channel):
         #res = pprint.pformat(enable_responses, indent=4)
         #post_attachment(escape_uid(res), rtm["channel"])
         response_msg(channel, "https://inside.kmc.gr.jp/~nos/app/nosponse/")
+    
 
 
 def show_help(text, channel):
@@ -225,6 +251,7 @@ def show_help(text, channel):
         return
     response_msg(channel, "<@UCCQ7MNEQ> がinviteされているチャンネルで有効です。\n"\
     "`(nosetting|<@UCCQ7MNEQ>) respond A to B` : BにAと返す反応を追加します。\n"\
+    "`(nosetting|<@UCCQ7MNEQ>) search A` : Aを含むトリガーを検索します。\n"\
     "`(nosetting|<@UCCQ7MNEQ>) delete A` : Aへの反応を削除します。\n"\
     "`(nosetting|<@UCCQ7MNEQ>) randomres A \\n B\\n C\\n ...` : Aに対してB,C...をランダムに返す反応を追加します。\n"\
     "`(nosetting|<@UCCQ7MNEQ>) rand add A \\n D\\n E\\n...` : Aに対してのランダムな反応のパターンを追加します。\n"\
@@ -324,6 +351,7 @@ def main_process(rtm):
     show_help(text, channel)
     add_rand_respond(text, channel)
     modify_rand_respond(text, channel)
+    search_responses(text, channel)
 
 
 def load_responses(responses_db_path):
