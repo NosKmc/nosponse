@@ -115,7 +115,7 @@ def make_block_template(triggers, responses):
         max_element_count = 10
         responses_field = [{
                     "type": "mrkdwn",
-                    "text": resp,
+                    "text": resp[:2000],
                 } for resp in responses]
         fields = split_with_count(responses_field, max_element_count)
         for field in fields:
