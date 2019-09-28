@@ -72,13 +72,14 @@ def make_block_template(triggers, responses):
 			"text": "*トリガー*"
 		}
 	}]
-    blocks.append({
-		"type": "section",
-		"fields": [{
-				"type": "mrkdwn",
-				"text": trig,
-			} for trig in triggers]
-	})
+    if not len(triggers) == 0:
+        blocks.append({
+            "type": "section",
+            "fields": [{
+                    "type": "mrkdwn",
+                    "text": trig,
+                } for trig in triggers]
+        })
     blocks.append({
 		"type": "divider"
 	})
@@ -89,13 +90,14 @@ def make_block_template(triggers, responses):
 			"text": "*反応*"
 		}
 	})
-    blocks.append({
-		"type": "section",
-		"fields": [{
-				"type": "mrkdwn",
-				"text": resp,
-			} for resp in responses]
-	})
+    if not len(responses) == 0:
+        blocks.append({
+            "type": "section",
+            "fields": [{
+                    "type": "mrkdwn",
+                    "text": resp,
+                } for resp in responses]
+        })
     return blocks
 
 
