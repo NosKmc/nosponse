@@ -143,7 +143,7 @@ def search_responses(text, channel):
     command = extract_command(pat_ns_delete, text)
     query = command.strip()
     messages = search_responses_from_db(responses_db_path, query)
-    if len(message) == 0:
+    if len(messages) == 0:
         response_msg(channel, "Not found")
     else:
         answer = '\n'.join(messages)
